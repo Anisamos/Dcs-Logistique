@@ -1,4 +1,4 @@
-# Technical Context: Next.js Starter Template
+# Technical Context: ADC Logistique
 
 ## Technology Stack
 
@@ -9,135 +9,72 @@
 | TypeScript   | 5.9.x   | Type-safe JavaScript            |
 | Tailwind CSS | 4.x     | Utility-first CSS               |
 | Bun          | Latest  | Package manager & runtime       |
+| Drizzle ORM  | 0.45.x  | SQLite database ORM             |
+| Recharts     | 3.8.x   | Charts and data visualization   |
+| Lucide React | 1.7.x   | Icon library                    |
 
-## Development Environment
+## Database Schema
 
-### Prerequisites
+9 tables: users, spaces, equipment, stock_items, stock_movements, projects, activities, purchases, cleanliness_checks
 
-- Bun installed (`curl -fsSL https://bun.sh/install | bash`)
-- Node.js 20+ (for compatibility)
+## Authentication
 
-### Commands
+Cookie-based session auth (SHA-256 password hashing). Multi-admin support.
+
+## Commands
 
 ```bash
 bun install        # Install dependencies
-bun dev            # Start dev server (http://localhost:3000)
+bun dev            # Start dev server
 bun build          # Production build
-bun start          # Start production server
 bun lint           # Run ESLint
 bun typecheck      # Run TypeScript type checking
+bun db:generate    # Generate Drizzle migrations
+bun db:migrate     # Run migrations
+bun db:seed        # Seed database with defaults
 ```
 
-## Project Configuration
+## API Routes
 
-### Next.js Config (`next.config.ts`)
-
-- App Router enabled
-- Default settings for flexibility
-
-### TypeScript Config (`tsconfig.json`)
-
-- Strict mode enabled
-- Path alias: `@/*` → `src/*`
-- Target: ESNext
-
-### Tailwind CSS 4 (`postcss.config.mjs`)
-
-- Uses `@tailwindcss/postcss` plugin
-- CSS-first configuration (v4 style)
-
-### ESLint (`eslint.config.mjs`)
-
-- Uses `eslint-config-next`
-- Flat config format
-
-## Key Dependencies
-
-### Production Dependencies
-
-```json
-{
-  "next": "^16.1.3", // Framework
-  "react": "^19.2.3", // UI library
-  "react-dom": "^19.2.3" // React DOM
-}
-```
-
-### Dev Dependencies
-
-```json
-{
-  "typescript": "^5.9.3",
-  "@types/node": "^24.10.2",
-  "@types/react": "^19.2.7",
-  "@types/react-dom": "^19.2.3",
-  "@tailwindcss/postcss": "^4.1.17",
-  "tailwindcss": "^4.1.17",
-  "eslint": "^9.39.1",
-  "eslint-config-next": "^16.0.0"
-}
-```
+| Route | Methods | Purpose |
+|-------|---------|---------|
+| /api/auth/login | POST | Login |
+| /api/auth/logout | POST | Logout |
+| /api/auth/me | GET | Current user |
+| /api/spaces | GET,POST,PUT,DELETE | Spaces CRUD |
+| /api/equipment | GET,POST,PUT,DELETE | Equipment CRUD |
+| /api/stock | GET,POST,PUT,DELETE | Stock CRUD + movements |
+| /api/purchases | GET,POST,PUT,DELETE | Purchases CRUD |
+| /api/projects | GET,POST,PUT,DELETE | Projects CRUD |
+| /api/activities | GET,POST,PUT,DELETE | Activities CRUD |
+| /api/statistics | GET | Statistics by period |
+| /api/cleanliness | GET,POST | Cleanliness checks |
 
 ## File Structure
 
 ```
-/
-├── .gitignore              # Git ignore rules
-├── package.json            # Dependencies and scripts
-├── bun.lock                # Bun lockfile
-├── next.config.ts          # Next.js configuration
-├── tsconfig.json           # TypeScript configuration
-├── postcss.config.mjs      # PostCSS (Tailwind) config
-├── eslint.config.mjs       # ESLint configuration
-├── public/                 # Static assets
-│   └── .gitkeep
-└── src/                    # Source code
-    └── app/                # Next.js App Router
-        ├── layout.tsx      # Root layout
-        ├── page.tsx        # Home page
-        ├── globals.css     # Global styles
-        └── favicon.ico     # Site icon
+src/
+├── app/
+│   ├── page.tsx                    # Login page
+│   ├── dashboard/
+│   │   ├── layout.tsx              # Dashboard layout with sidebar
+│   │   ├── page.tsx                # Dashboard home
+│   │   ├── espaces/page.tsx        # Spaces management
+│   │   ├── equipements/page.tsx    # Equipment management
+│   │   ├── stocks/page.tsx         # Stock management
+│   │   ├── achats/page.tsx         # Purchases/invoices
+│   │   ├── projets/page.tsx        # Projects & activities
+│   │   └── statistiques/page.tsx   # Statistics & charts
+│   └── api/                        # API routes
+├── components/
+│   ├── Sidebar.tsx                 # Navigation sidebar
+│   ├── FormModal.tsx               # Modal form wrapper
+│   └── StatCard.tsx                # Statistics card
+├── db/
+│   ├── schema.ts                   # Drizzle schema
+│   ├── index.ts                    # Database client
+│   └── migrate.ts                  # Migration runner
+└── lib/
+    ├── auth.ts                     # Authentication utilities
+    └── api-helpers.ts              # API route helpers
 ```
-
-## Technical Constraints
-
-### Starting Point
-
-- Minimal structure - expand as needed
-- No database by default (use recipe to add)
-- No authentication by default (add when needed)
-
-### Browser Support
-
-- Modern browsers (ES2020+)
-- No IE11 support
-
-## Performance Considerations
-
-### Image Optimization
-
-- Use Next.js `Image` component for optimization
-- Place images in `public/` directory
-
-### Bundle Size
-
-- Tree-shaking enabled by default
-- Tailwind CSS purges unused styles
-
-### Core Web Vitals
-
-- Server Components reduce client JavaScript
-- Streaming and Suspense for better UX
-
-## Deployment
-
-### Build Output
-
-- Server-rendered pages by default
-- Can be configured for static export
-
-### Environment Variables
-
-- None required for base template
-- Add as needed for features
-- Use `.env.local` for local development

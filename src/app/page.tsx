@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -36,6 +37,25 @@ export default function LoginPage() {
       setError("Erreur de connexion");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleReset() {
+    setResetting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/reset-password", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        setEmail(data.credentials.email);
+        setPassword(data.credentials.password);
+      } else {
+        setError(data.error || "Erreur de réinitialisation");
+      }
+    } catch {
+      setError("Erreur de réinitialisation");
+    } finally {
+      setResetting(false);
     }
   }
 
@@ -93,6 +113,15 @@ export default function LoginPage() {
             className="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50"
           >
             {loading ? "Connexion..." : "Se connecter"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleReset}
+            disabled={resetting}
+            className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm py-2 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {resetting ? "Réinitialisation..." : "Réinitialiser les identifiants"}
           </button>
         </form>
       </div>
